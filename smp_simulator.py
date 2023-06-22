@@ -13,6 +13,8 @@ from collections import namedtuple
 Op = namedtuple('Op', 'cpu action')
 operations_sequence = [Op(0, 'read'), Op(1, 'write'), Op(2, 'read')]
 operations_sequence = [Op(0, 'read'), Op(0, 'write'), Op(0, 'write'), Op(1, 'read')]
+operations_sequence = [Op(0, 'write'), Op(0, 'read'), Op(0, 'write')]
+operations_sequence = [Op(0, 'read'), Op(1, 'read'), Op(2, 'write')]
 
 
 # This class will hold cache information of each CPU and the bus
@@ -473,7 +475,7 @@ def MESI(env, current_CPU, current_operation):
             env.cpu_caches[current_CPU] = 'Modified'
 
             # Bus operation
-            env.bus[0] = f'BusRd(C{current_CPU}), Flush(C {shared_idx})'
+            env.bus[0] = f'BusRdX(C{current_CPU}), Flush(C {shared_idx})'
     
         # There is no Shared or Modified
         else:
@@ -521,7 +523,7 @@ def MESI(env, current_CPU, current_operation):
             # Bus operation
             env.bus[0] = f'BusRd(S)(C{current_CPU}), Flush(C {shared_idx})'
 
-        # There is no Shared or Modified
+        # There are no copies in any other cache 
         else:
             # Update the state
             env.cpu_caches[current_CPU] = 'Exclusive'
